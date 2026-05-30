@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import RequireAuth from "@/components/RequireAuth";
+import AuthenticatedHeader from "@/components/AuthenticatedHeader";
 
 type OrderItem = {
   productName: string;
@@ -119,8 +120,9 @@ export default function KitchenPage() {
 
   return (
     <RequireAuth>
-      <div className="min-h-screen p-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto">
+      <div className="min-h-screen bg-gray-50">
+        <AuthenticatedHeader currentPage="kitchen" showKitchen title="MITRA Enterprise" />
+        <div className="mx-auto max-w-5xl p-6">
           <h1 className="text-2xl text-gray-800 font-semibold mb-4">Kitchen Orders</h1>
 
           {loading && <div className="text-gray-600">Loading orders...</div>}

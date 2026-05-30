@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import useSession from "@/lib/hooks/useSession";
+import AuthenticatedHeader from "@/components/AuthenticatedHeader";
 
 type SessionUser = {
   id: string;
@@ -38,52 +38,12 @@ const modules = [
 import RequireAuth from "@/components/RequireAuth";
 
 export default function DashboardPage() {
-  const router = useRouter();
   const { user, loading } = useSession();
-  const [message, setMessage] = useState("");
-
-  async function handleLogout() {
-    setMessage("");
-
-    try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      router.replace("/");
-    } catch {
-      setMessage("Logout failed. Please try again.");
-    }
-  }
 
   return (
     <RequireAuth>
       <main className="min-h-screen bg-[#f5f0e6] text-[#16332d]">
-        <header className="border-b border-white/50 bg-[#11352e] px-4 py-3 text-white shadow-[0_6px_24px_rgba(0,0,0,0.08)] sm:px-6 lg:px-8">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-linear-to-br from-[#d8e19b] to-[#c5a84d] text-xl font-semibold text-[#16332d]">T</div>
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.3em] text-[#d8e19b]">MITRA Enterprise</p>
-                <p className="text-xl font-semibold tracking-[0.18em]">T-CAFE <span className="font-serif italic text-[#76e6d8]">MIST</span></p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <a href="/pos" className="rounded-xl bg-[#d8ae39] px-4 py-2 text-sm font-semibold text-[#102e28] transition hover:bg-[#e0bb4b]">POS</a>
-              {(user?.role === "admin" || user?.role === "staff") ? (
-                <a href="/kitchen" className="rounded-xl bg-[#76e6d8] px-4 py-2 text-sm font-semibold text-[#102e28] transition hover:opacity-90">Kitchen</a>
-              ) : null}
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="rounded-xl bg-[#d8ae39] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#102e28] transition hover:bg-[#e0bb4b]"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </header>
+        <AuthenticatedHeader currentPage="dashboard" showKitchen={user?.role === "admin" || user?.role === "staff"} title="MITRA Enterprise" />
 
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
@@ -117,8 +77,6 @@ export default function DashboardPage() {
                   </article>
                 </div>
               ) : null}
-
-              {message ? <p className="mt-4 text-sm text-rose-700">{message}</p> : null}
 
               <div className="mt-8 grid gap-4 sm:grid-cols-4">
                 {quickStats.map((item) => (

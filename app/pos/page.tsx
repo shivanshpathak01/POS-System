@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import useSession from "@/lib/hooks/useSession";
+import AuthenticatedHeader from "@/components/AuthenticatedHeader";
 
 type Product = {
   _id: string;
@@ -88,6 +89,20 @@ export default function PosPage() {
     });
   }
 
+  function increaseQuantity(productId: string) {
+    setCart((current) =>
+      current.map((item) => (item.product._id === productId ? { ...item, quantity: item.quantity + 1 } : item))
+    );
+  }
+
+  function decreaseQuantity(productId: string) {
+    setCart((current) =>
+      current
+        .map((item) => (item.product._id === productId ? { ...item, quantity: item.quantity - 1 } : item))
+        .filter((item) => item.quantity > 0)
+    );
+  }
+
   function clearCart() {
     setCart([]);
 
@@ -101,17 +116,7 @@ export default function PosPage() {
   return (
     <RequireAuth>
       <main className="min-h-screen bg-[#f5f0e6] text-[#16332d]">
-      <header className="border-b border-white/50 bg-[#11352e] px-4 py-3 text-white shadow-[0_6px_24px_rgba(0,0,0,0.08)] sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.3em] text-[#d8e19b]">MITRA Enterprise</p>
-            <h1 className="text-2xl font-semibold tracking-[0.18em]">T-CAFE <span className="font-serif italic text-[#76e6d8]">MIST</span></h1>
-          </div>
-          <a href="/dashboard" className="rounded-xl bg-[#d8ae39] px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#102e28] transition hover:bg-[#e0bb4b]">
-            Dashboard
-          </a>
-        </div>
-      </header>
+        <AuthenticatedHeader currentPage="pos" title="MITRA Enterprise" />
 
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="text-center">
@@ -167,15 +172,38 @@ export default function PosPage() {
                   Cart is empty. Add products from the menu list.
                 </p>
               ) : (
-                  cart.map((item) => (
-                    <div key={item.product._id} className="flex items-center justify-between rounded-3xl border border-[#dde5d9] bg-[#fbfaf7] px-4 py-3 text-sm">
-                      <div>
-                        <p className="font-semibold text-[#16332d]">{item.product.name}</p>
-                        <p className="text-slate-500">{item.quantity} x ₹{item.product.price}</p>
-                      </div>
-                      <p className="font-semibold text-[#11352e]">₹{(item.product.price * item.quantity).toFixed(2)}</p>
+                cart.map((item) => (
+                  <div key={item.product._id} className="flex items-center justify-between gap-4 rounded-3xl border border-[#dde5d9] bg-[#fbfaf7] px-4 py-3 text-sm">
+                    <div>
+                      <p className="font-semibold text-[#16332d]">{item.product.name}</p>
+                      <p className="text-slate-500">₹{item.product.price} each</p>
                     </div>
-                  ))
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center rounded-2xl border border-[#d8e0d6] bg-white">
+                        <button
+                          type="button"
+                          onClick={() => decreaseQuantity(item.product._id)}
+                          className="grid h-9 w-9 place-items-center rounded-l-2xl text-lg font-semibold text-[#11352e] transition hover:bg-[#f3f6f0]"
+                          aria-label={`Decrease ${item.product.name}`}
+                        >
+                          -
+                        </button>
+                        <span className="min-w-10 px-3 text-center font-semibold text-[#16332d]">{item.quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => increaseQuantity(item.product._id)}
+                          className="grid h-9 w-9 place-items-center rounded-r-2xl text-lg font-semibold text-[#11352e] transition hover:bg-[#f3f6f0]"
+                          aria-label={`Increase ${item.product.name}`}
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <p className="min-w-24 text-right font-semibold text-[#11352e]">₹{(item.product.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
 

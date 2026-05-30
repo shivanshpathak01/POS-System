@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import AuthenticatedHeader from "@/components/AuthenticatedHeader";
 
 type Product = {
   _id: string;
@@ -89,8 +90,9 @@ export default function QRTablePage({ params }: { params: { table: string } }) {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <AuthenticatedHeader currentPage="qr" title="MITRA Enterprise" />
+      <div className="mx-auto max-w-5xl p-6">
         <h1 className="text-2xl font-semibold mb-4">QR Menu — Table {table}</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -19,9 +19,9 @@ export function proxy(request: NextRequest) {
   try {
     const session = verifyToken(token);
 
-    if (request.nextUrl.pathname.startsWith("/dashboard") || request.nextUrl.pathname.startsWith("/kitchen")) {
+    if (request.nextUrl.pathname.startsWith("/kitchen")) {
       if (session.role !== "admin" && session.role !== "staff") {
-        return NextResponse.redirect(new URL("/pos", request.url));
+        return NextResponse.redirect(new URL("/dashboard", request.url));
       }
     }
 

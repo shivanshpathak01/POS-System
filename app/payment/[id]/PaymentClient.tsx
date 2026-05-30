@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
+import AuthenticatedHeader from "@/components/AuthenticatedHeader";
 
 export default function PaymentClient({ orderId, initialOrder }: { orderId: string; initialOrder?: any | null }) {
   const router = useRouter();
@@ -115,8 +116,10 @@ export default function PaymentClient({ orderId, initialOrder }: { orderId: stri
   const payUrl = `/api/payments/${orderId}/pay`;
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50">
-      <div className="max-w-3xl mx-auto bg-white p-6 rounded shadow">
+    <div className="min-h-screen bg-gray-50">
+      <AuthenticatedHeader currentPage="payment" title="MITRA Enterprise" />
+      <div className="mx-auto max-w-3xl p-6">
+        <div className="bg-white p-6 rounded shadow">
         <h2 className="text-xl text-gray-800 font-semibold">Pay for order {order.orderNumber}</h2>
         <p className="mt-2 text-gray-600">Amount: ₹{order.totalAmount}</p>
 
@@ -140,6 +143,7 @@ export default function PaymentClient({ orderId, initialOrder }: { orderId: stri
         <div className="mt-6">
           <button onClick={() => router.push('/dashboard')} className="rounded px-3 py-2 bg-[#11352e] text-white">Back to dashboard</button>
         </div>
+      </div>
       </div>
     </div>
   );
