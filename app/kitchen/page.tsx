@@ -79,7 +79,7 @@ export default function KitchenPage() {
     <RequireAuth>
       <div className="min-h-screen p-6 bg-gray-50">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-2xl font-semibold mb-4">Kitchen Orders</h1>
+          <h1 className="text-2xl text-gray-800 font-semibold mb-4">Kitchen Orders</h1>
 
           {loading && <div>Loading orders...</div>}
 
@@ -91,19 +91,19 @@ export default function KitchenPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-sm text-gray-600">{order.orderNumber} • {new Date(order.createdAt).toLocaleString()}</div>
-                    <div className="text-lg font-semibold">{order.source.toUpperCase()}</div>
+                    <div className="text-lg text-gray-800 font-semibold">{order.source.toUpperCase()}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm">Status</div>
-                    <div className="font-semibold">{order.status}</div>
+                    <div className="text-sm text-gray-600">Status</div>
+                    <div className="font-semibold text-gray-800">{order.status}</div>
                   </div>
                 </div>
 
                 <div className="mt-3 border-t pt-3">
                   {order.items.map((it, idx) => (
-                    <div key={idx} className="flex items-center justify-between py-1">
+                    <div key={idx} className="flex items-center text-gray-800 justify-between py-1">
                       <div>
-                        <div className="font-medium">{it.productName}</div>
+                        <div className="font-medium text-gray-800">{it.productName}</div>
                         <div className="text-sm text-gray-600">{it.quantity} x ₹{it.unitPrice}</div>
                       </div>
                       <div className="font-semibold">₹{it.lineTotal}</div>
@@ -112,7 +112,7 @@ export default function KitchenPage() {
 
                   <div className="mt-3 flex items-center justify-between">
                     <div className="text-sm text-gray-600">Total</div>
-                    <div className="font-semibold">₹{order.totalAmount}</div>
+                    <div className="font-semibold text-gray-800">₹{order.totalAmount}</div>
                   </div>
 
                   <div className="mt-3 flex gap-2">

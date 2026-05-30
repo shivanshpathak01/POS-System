@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useSession from "@/lib/hooks/useSession";
 
@@ -8,13 +8,13 @@ export default function RequireAuth({ children }: { children: React.ReactNode })
   const { user, loading } = useSession();
   const router = useRouter();
 
-  if (loading) {
-    return <div className="p-6">Loading session...</div>;
-  }
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/");
+    }
+  }, [loading, router, user]);
 
-  if (!user) {
-    // client redirect to landing
-    if (typeof window !== "undefined") router.replace("/");
+  if (!loading && !user) {
     return null;
   }
 

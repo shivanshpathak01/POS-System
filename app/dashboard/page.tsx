@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import useSession from "@/lib/hooks/useSession";
 
 type SessionUser = {
   id: string;
@@ -38,41 +39,8 @@ import RequireAuth from "@/components/RequireAuth";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<SessionUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useSession();
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadSession() {
-      try {
-        const response = await fetch("/api/auth/me", { credentials: "include" });
-
-        if (!active) {
-          return;
-        }
-
-        if (!response.ok) {
-          router.replace("/");
-          return;
-        }
-
-        const data = (await response.json()) as { user: SessionUser };
-        setUser(data.user);
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadSession();
-
-    return () => {
-      active = false;
-    };
-  }, [router]);
 
   async function handleLogout() {
     setMessage("");
@@ -228,8 +196,25 @@ export default function DashboardPage() {
 
 function QRGenerator() {
   const [table, setTable] = useState(1);
-  const base = typeof window !== "undefined" ? window.location.origin : "";
-  const link = `${base}/qr/${table}`;
+
+  // Use a stable relative link for SSR and initial client render to avoid
+  // hydration mismatches. Convert to an absolute URL on the client after
+  // mount so QR codes contain a full origin when scanned.
+  const relativeLink = `/qr/${table}`;
+  const [link, setLink] = useState(relativeLink);
+
+  useEffect(() => {
+    setLink(relativeLink); // keep in sync immediately
+
+    if (typeof window === "undefined") return;
+
+    try {
+      const origin = window.location.origin || "";
+      if (origin) setLink(`${origin}${relativeLink}`);
+    } catch {
+      // ignore
+    }
+  }, [table, relativeLink]);
 
   return (
     <div className="mt-3 flex items-center gap-4">

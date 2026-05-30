@@ -91,8 +91,8 @@ export default function PaymentClient({ orderId, initialOrder }: { orderId: stri
   return (
     <div className="min-h-screen p-6 bg-gray-50">
       <div className="max-w-3xl mx-auto bg-white p-6 rounded shadow">
-        <h2 className="text-xl font-semibold">Pay for order {order.orderNumber}</h2>
-        <p className="mt-2">Amount: ₹{order.totalAmount}</p>
+        <h2 className="text-xl text-gray-800 font-semibold">Pay for order {order.orderNumber}</h2>
+        <p className="mt-2 text-gray-600">Amount: ₹{order.totalAmount}</p>
 
         <div className="mt-4 flex items-center gap-4">
           <div>
@@ -107,8 +107,8 @@ export default function PaymentClient({ orderId, initialOrder }: { orderId: stri
         </div>
 
         <div className="mt-6">
-          <p>Payment status: <strong>{order.paymentStatus}</strong></p>
-          <p>Order status: <strong>{order.status}</strong></p>
+          <p className="text-gray-600">Payment status: <strong>{order.paymentStatus}</strong></p>
+          <p className="text-gray-600">Order status: <strong>{order.status}</strong></p>
         </div>
 
         <div className="mt-6">

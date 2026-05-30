@@ -21,12 +21,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Invalid order data", issues: parsedBody.error.flatten() }, { status: 400 });
   }
 
-  // Allow QR orders from public users (no session). For other sources require authenticated staff/admin.
+  // Allow QR orders from public users (no session). For POS orders, allow any authenticated role
+  // so customers can create orders directly from the POS screen as well.
   const isQrOrder = parsedBody.data.source === "qr";
   const session = readSessionFromRequest(request);
 
   if (!isQrOrder) {
-    if (!session || session.role === "customer") {
+    if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
   }
