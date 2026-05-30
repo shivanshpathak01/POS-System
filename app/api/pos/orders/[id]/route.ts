@@ -3,6 +3,7 @@ import { isValidObjectId } from "mongoose";
 import { readSessionFromRequest } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/lib/models/order";
+import { emitOrderRealtime } from "@/lib/realtime";
 
 export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const session = readSessionFromRequest(request);
@@ -33,6 +34,8 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
   if (!order) {
     return NextResponse.json({ message: "Order not found" }, { status: 404 });
   }
+
+  emitOrderRealtime(order);
 
   return NextResponse.json({ order });
 }

@@ -71,7 +71,9 @@ export default function DashboardPage() {
 
             <div className="flex items-center gap-3">
               <a href="/pos" className="rounded-xl bg-[#d8ae39] px-4 py-2 text-sm font-semibold text-[#102e28] transition hover:bg-[#e0bb4b]">POS</a>
-              <a href="/kitchen" className="rounded-xl bg-[#76e6d8] px-4 py-2 text-sm font-semibold text-[#102e28] transition hover:opacity-90">Kitchen</a>
+              {(user?.role === "admin" || user?.role === "staff") ? (
+                <a href="/kitchen" className="rounded-xl bg-[#76e6d8] px-4 py-2 text-sm font-semibold text-[#102e28] transition hover:opacity-90">Kitchen</a>
+              ) : null}
               <button
                 type="button"
                 onClick={handleLogout}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
+import useSession from "@/lib/hooks/useSession";
 
 type Product = {
   _id: string;
@@ -13,13 +14,35 @@ type Product = {
 
 type CartItem = { product: Product; quantity: number };
 
+function getCartStorageKey(userId?: string) {
+  return userId ? `mitra_cart:${userId}` : "mitra_cart:guest";
+}
+
+function readStoredCart(storageKey: string) {
+  if (typeof window === "undefined") {
+    return [] as CartItem[];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(storageKey);
+    if (!raw) return [] as CartItem[];
+
+    const parsed = JSON.parse(raw) as CartItem[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [] as CartItem[];
+  }
+}
+
 import RequireAuth from "@/components/RequireAuth";
 
 export default function PosPage() {
+  const { user } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const storageKey = getCartStorageKey(user?.id);
 
   useEffect(() => {
     fetch("/api/products")
@@ -28,6 +51,26 @@ export default function PosPage() {
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
+
+    setCart(readStoredCart(storageKey));
+  }, [storageKey, user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(cart));
+    } catch {
+      // ignore storage failures
+    }
+  }, [cart, storageKey, user?.id]);
 
   const subtotal = useMemo(() => cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [cart]);
   const tax = +(subtotal * 0.05).toFixed(2);
@@ -43,6 +86,16 @@ export default function PosPage() {
 
       return [...current, { product, quantity: 1 }];
     });
+  }
+
+  function clearCart() {
+    setCart([]);
+
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch {
+      // ignore storage failures
+    }
   }
 
   return (
@@ -172,8 +225,8 @@ export default function PosPage() {
                   } else {
                     const data = await res.json();
                     // redirect to payment page
-                    const id = data.order._id || data.order.id || data.order.orderNumber;
                     window.location.href = `/payment/${data.order._id}`;
+                    clearCart();
                   }
                 } catch (e) {
                   alert("Network error");
@@ -185,6 +238,15 @@ export default function PosPage() {
               disabled={submitting}
             >
               {submitting ? "Creating..." : "Create order"}
+            </button>
+
+            <button
+              type="button"
+              onClick={clearCart}
+              className="mt-3 w-full rounded-2xl border border-[#d8ae39] bg-transparent px-4 py-3 font-semibold text-[#11352e] transition hover:bg-[#fbfaf7]"
+              disabled={submitting || cart.length === 0}
+            >
+              Clear cart
             </button>
           </aside>
         </div>

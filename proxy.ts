@@ -17,7 +17,14 @@ export function proxy(request: NextRequest) {
   }
 
   try {
-    verifyToken(token);
+    const session = verifyToken(token);
+
+    if (request.nextUrl.pathname.startsWith("/dashboard") || request.nextUrl.pathname.startsWith("/kitchen")) {
+      if (session.role !== "admin" && session.role !== "staff") {
+        return NextResponse.redirect(new URL("/pos", request.url));
+      }
+    }
+
     return NextResponse.next();
   } catch {
     return NextResponse.redirect(new URL("/", request.url));

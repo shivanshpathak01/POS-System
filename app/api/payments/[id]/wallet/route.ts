@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { readSessionFromRequest } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/lib/models/order";
+import { emitOrderRealtime } from "@/lib/realtime";
 import { Wallet } from "@/lib/models/wallet";
 import { WalletTransaction } from "@/lib/models/walletTransaction";
 
@@ -58,6 +59,8 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
   order.status = "preparing";
 
   await order.save();
+
+  emitOrderRealtime(order);
 
   return NextResponse.json({ message: "Wallet payment recorded", order, wallet, transaction });
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/lib/models/order";
+import { emitOrderRealtime } from "@/lib/realtime";
 import { randomBytes } from "crypto";
 
 export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
@@ -19,6 +20,8 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
   order.status = "preparing";
 
   await order.save();
+
+  emitOrderRealtime(order);
 
   return NextResponse.json({ message: "Payment recorded", order });
 }

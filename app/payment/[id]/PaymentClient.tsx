@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { io, Socket } from "socket.io-client";
 
 export default function PaymentClient({ orderId, initialOrder }: { orderId: string; initialOrder?: any | null }) {
   const router = useRouter();
   const [order, setOrder] = useState<any | null>(initialOrder ?? null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialOrder);
   const [checking, setChecking] = useState(false);
 
   async function load() {
@@ -27,10 +28,35 @@ export default function PaymentClient({ orderId, initialOrder }: { orderId: stri
   }
 
   useEffect(() => {
-    // If we already have an initial order from the server, skip the first fetch
-    if (!order) load();
-    const t = setInterval(load, 3000);
-    return () => clearInterval(t);
+    if (!order) {
+      load();
+    }
+
+    const socket: Socket = io({
+      path: "/socket.io",
+      transports: ["websocket"],
+    });
+
+    socket.emit("order:subscribe", orderId);
+
+    socket.on("payment:updated", (payload: { orderId?: string; order?: any }) => {
+      if (payload?.orderId === orderId && payload?.order) {
+        setOrder(payload.order);
+        setLoading(false);
+      }
+    });
+
+    socket.on("order:updated", (payload: { orderId?: string; order?: any }) => {
+      if (payload?.orderId === orderId && payload?.order) {
+        setOrder(payload.order);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      socket.emit("order:unsubscribe", orderId);
+      socket.disconnect();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
 
@@ -86,7 +112,7 @@ export default function PaymentClient({ orderId, initialOrder }: { orderId: stri
   if (loading) return <div className="p-6">Loading payment...</div>;
   if (!order) return <div className="p-6">Order not found.</div>;
 
-  const payUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/api/payments/${orderId}/pay`;
+  const payUrl = `/api/payments/${orderId}/pay`;
 
   return (
     <div className="min-h-screen p-6 bg-gray-50">

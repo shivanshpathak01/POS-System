@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { readSessionFromRequest } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/lib/models/order";
+import { emitKitchenRealtime, emitOrderRealtime } from "@/lib/realtime";
 import { orderSchema } from "@/lib/schemas";
 
 function buildOrderNumber() {
@@ -53,6 +54,9 @@ export async function POST(request: NextRequest) {
     paymentStatus: "pending",
     paymentMethod: "qr",
   });
+
+  emitKitchenRealtime("order:created", { orderId: String(order._id), order });
+  emitOrderRealtime(order);
 
   return NextResponse.json({ order }, { status: 201 });
 }

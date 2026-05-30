@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
 import RequireAuth from "@/components/RequireAuth";
 
 type OrderItem = {
@@ -48,8 +49,49 @@ export default function KitchenPage() {
 
   useEffect(() => {
     load();
-    const t = setInterval(load, 5000);
-    return () => clearInterval(t);
+
+    const socket: Socket = io({
+      path: "/socket.io",
+      transports: ["websocket"],
+    });
+
+    socket.emit("kitchen:subscribe");
+
+    function upsertOrder(nextOrder: Order) {
+      setOrders((current) => {
+        const exists = current.some((item) => item._id === nextOrder._id);
+
+        if (!exists) {
+          return [nextOrder, ...current].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+        }
+
+        return current
+          .map((item) => (item._id === nextOrder._id ? nextOrder : item))
+          .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+      });
+    }
+
+    socket.on("order:created", (payload: { order?: Order }) => {
+      if (payload?.order) {
+        upsertOrder(payload.order);
+      }
+    });
+
+    socket.on("order:updated", (payload: { order?: Order }) => {
+      if (payload?.order) {
+        upsertOrder(payload.order);
+      }
+    });
+
+    socket.on("kitchen:unauthorized", () => {
+      socket.disconnect();
+      window.location.href = "/";
+    });
+
+    return () => {
+      socket.emit("kitchen:unsubscribe");
+      socket.disconnect();
+    };
   }, []);
 
   async function updateStatus(id: string, status: string) {
@@ -81,7 +123,7 @@ export default function KitchenPage() {
         <div className="max-w-5xl mx-auto">
           <h1 className="text-2xl text-gray-800 font-semibold mb-4">Kitchen Orders</h1>
 
-          {loading && <div>Loading orders...</div>}
+          {loading && <div className="text-gray-600">Loading orders...</div>}
 
           {!loading && orders.length === 0 && <div>No current orders</div>}
 
