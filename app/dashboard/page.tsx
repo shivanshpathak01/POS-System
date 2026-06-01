@@ -52,9 +52,7 @@ export default function DashboardPage() {
               <h1 className="mt-4 text-4xl font-semibold tracking-tight text-[#16332d] sm:text-5xl">
                 Popular <span className="font-serif italic text-[#76e6d8]">Menu</span> operations
               </h1>
-              <p className="mt-4 max-w-3xl text-slate-600">
-                Session is active. Manage the Day 1 and Day 2 assessment flow from this branded workspace.
-              </p>
+              
 
               {loading ? (
                 <p className="mt-6 text-sm text-slate-500">Loading session...</p>
@@ -78,14 +76,6 @@ export default function DashboardPage() {
                 </div>
               ) : null}
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-4">
-                {quickStats.map((item) => (
-                  <article key={item.title} className="rounded-3xl border border-[#dde5d9] bg-[#fbfaf7] p-4 shadow-sm">
-                    <p className="text-xs uppercase tracking-[0.25em] text-slate-400">{item.title}</p>
-                    <p className="mt-3 text-2xl font-semibold text-[#16332d]">{item.value}</p>
-                  </article>
-                ))}
-              </div>
 
               <div className="mt-8">
                 <h3 className="text-lg font-semibold">QR Menu Generator</h3>
@@ -118,30 +108,6 @@ export default function DashboardPage() {
             </aside>
           </div>
 
-          <section className="mt-8 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <article className="rounded-4xl bg-white p-6 shadow-[0_20px_60px_rgba(21,41,36,0.12)]">
-              <h2 className="text-lg font-semibold text-[#16332d]">Build scope</h2>
-              <ul className="mt-4 space-y-3 text-sm text-slate-600">
-                {modules.map((module) => (
-                  <li key={module} className="rounded-[1.25rem] border border-[#dde5d9] bg-[#fbfaf7] px-4 py-3">
-                    {module}
-                  </li>
-                ))}
-              </ul>
-            </article>
-
-            <article className="rounded-4xl bg-white p-6 shadow-[0_20px_60px_rgba(21,41,36,0.12)]">
-              <h2 className="text-lg font-semibold text-[#16332d]">Working endpoints</h2>
-              <div className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
-                <p className="rounded-[1.25rem] border border-[#dde5d9] bg-[#fbfaf7] px-4 py-3">/api/auth/register</p>
-                <p className="rounded-[1.25rem] border border-[#dde5d9] bg-[#fbfaf7] px-4 py-3">/api/auth/login</p>
-                <p className="rounded-[1.25rem] border border-[#dde5d9] bg-[#fbfaf7] px-4 py-3">/api/auth/me</p>
-                <p className="rounded-[1.25rem] border border-[#dde5d9] bg-[#fbfaf7] px-4 py-3">/api/categories</p>
-                <p className="rounded-[1.25rem] border border-[#dde5d9] bg-[#fbfaf7] px-4 py-3">/api/products</p>
-                <p className="rounded-[1.25rem] border border-[#dde5d9] bg-[#fbfaf7] px-4 py-3">/api/pos/orders</p>
-              </div>
-            </article>
-          </section>
         </section>
         <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
           <div className="rounded-[2.25rem] bg-white p-6 shadow-[0_20px_60px_rgba(21,41,36,0.12)] sm:p-8">
@@ -157,9 +123,6 @@ export default function DashboardPage() {
 function QRGenerator() {
   const [table, setTable] = useState(1);
 
-  // Use a stable relative link for SSR and initial client render to avoid
-  // hydration mismatches. Convert to an absolute URL on the client after
-  // mount so QR codes contain a full origin when scanned.
   const relativeLink = `/qr/${table}`;
   const [link, setLink] = useState(relativeLink);
 

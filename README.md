@@ -1,19 +1,5 @@
 MITRA Enterprise assessment scaffold built with Next.js, TypeScript, MongoDB, and JWT authentication.
 
-## Scope in this branch
-
-Day 1:
-
-- Project setup
-- MongoDB schema foundation
-- Authentication module
-
-Day 2:
-
-- Product management APIs
-- Category APIs
-- POS interface
-
 ## Environment
 
 Create a local `.env` file from `.env.example` with:
