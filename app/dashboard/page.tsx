@@ -112,7 +112,7 @@ export default function DashboardPage() {
         <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
           <div className="rounded-[2.25rem] bg-white p-6 shadow-[0_20px_60px_rgba(21,41,36,0.12)] sm:p-8">
             <h2 className="text-lg font-semibold">Recent orders</h2>
-            <RecentOrders />
+            <RecentOrders canViewAllOrders={user?.role === "admin" || user?.role === "staff"} />
           </div>
         </section>
       </main>
@@ -148,7 +148,7 @@ function QRGenerator() {
   );
 }
 
-function RecentOrders() {
+function RecentOrders({ canViewAllOrders }: { canViewAllOrders: boolean }) {
   const [orders, setOrders] = useState<any[]>([]);
 
   useEffect(() => {
@@ -166,6 +166,11 @@ function RecentOrders() {
         <div key={o._id} className="flex items-center justify-between border rounded p-3">
           <div>
             <div className="font-semibold">{o.orderNumber} • {o.source}</div>
+            {canViewAllOrders ? (
+              <div className="text-sm text-slate-500">
+                Ordered by {o.createdBy?.name ?? o.createdBy?.email ?? "Guest"}
+              </div>
+            ) : null}
             <div className="text-sm text-slate-500">{new Date(o.createdAt).toLocaleString()}</div>
           </div>
           <div className="text-right">
