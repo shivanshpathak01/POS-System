@@ -21,6 +21,7 @@ export default function AuthenticatedHeader({
   const router = useRouter();
   const { user, logout } = useSession();
   const [open, setOpen] = useState(false);
+  const canSeeKitchen = showKitchen || user?.role === "admin" || user?.role === "staff";
 
   const initials = useMemo(() => {
     if (!user?.name) return "U";
@@ -59,7 +60,7 @@ export default function AuthenticatedHeader({
           <Link href="/dashboard" className={linkClass("dashboard")}>Dashboard</Link>
           <Link href="/pos" className={linkClass("pos")}>POS</Link>
           <Link href="/wallet" className={linkClass("wallet")}>Wallet</Link>
-          {showKitchen ? <Link href="/kitchen" className={linkClass("kitchen")}>Kitchen</Link> : null}
+          {canSeeKitchen ? <Link href="/kitchen" className={linkClass("kitchen")}>Kitchen</Link> : null}
           {showBackToDashboard ? <Link href="/dashboard" className={linkClass("dashboard")}>Back to dashboard</Link> : null}
         </div>
 
@@ -89,7 +90,7 @@ export default function AuthenticatedHeader({
                 <Link href="/dashboard" onClick={() => setOpen(false)} className="rounded-2xl border border-[#dde5d9] px-4 py-3 text-sm font-semibold hover:bg-[#fbfaf7]">Dashboard</Link>
                 <Link href="/pos" onClick={() => setOpen(false)} className="rounded-2xl border border-[#dde5d9] px-4 py-3 text-sm font-semibold hover:bg-[#fbfaf7]">POS</Link>
                 <Link href="/wallet" onClick={() => setOpen(false)} className="rounded-2xl border border-[#dde5d9] px-4 py-3 text-sm font-semibold hover:bg-[#fbfaf7]">Wallet</Link>
-                {showKitchen ? <Link href="/kitchen" onClick={() => setOpen(false)} className="rounded-2xl border border-[#dde5d9] px-4 py-3 text-sm font-semibold hover:bg-[#fbfaf7]">Kitchen</Link> : null}
+                {canSeeKitchen ? <Link href="/kitchen" onClick={() => setOpen(false)} className="rounded-2xl border border-[#dde5d9] px-4 py-3 text-sm font-semibold hover:bg-[#fbfaf7]">Kitchen</Link> : null}
                 <button
                   type="button"
                   onClick={handleLogout}
